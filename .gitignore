@@ -1,0 +1,4 @@
+.env
+dhparam.pem
+*.key
+*.crt
