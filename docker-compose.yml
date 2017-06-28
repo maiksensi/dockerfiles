@@ -43,9 +43,18 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=${DB_HOST}
+    links:
+      - redis:redis
     depends_on:
       - nextcloud-db
     volumes:
       - nextcloud-data:/data
       - nextcloud-config:/config
       - nextcloud-apps:/apps2
+
+# If using Redis
+  redis:
+    image: redis:alpine
+    container_name: redis
+    volumes:
+      - /mnt/docker/redis:/data
