@@ -5,6 +5,8 @@ volumes:
   nextcloud-data:
   nextcloud-config:
   nextcloud-apps:
+  nextcloud-themes:
+  nextcloud-redis:
 
 services:
   nextcloud-nginx:
@@ -13,10 +15,16 @@ services:
       - 80:80
       - 443:443
     links:
-      - nextcloud    
+      - nextcloud   
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    volumes:
+      - nextcloud-redis:/data
 
   nextcloud-db:
-    image: mariadb
+    image: mariadb:10
     volumes:
       - nextcloud-db-data:/var/lib/mysql
     environment:
@@ -33,7 +41,6 @@ services:
       - UPLOAD_MAX_SIZE=${UPLOAD_MAX_SIZE}
       - APC_SHM_SIZE=${APC_SHM_SIZE}
       - OPCACHE_MEM_SIZE=${OPCACHE_MEM_SIZE}
-      - REDIS_MAX_MEMORY=${REDIS_MAX_MEMORY}
       - CRON_PERIOD=${CRON_PERIOD}
       - TZ=${TZ}
       - ADMIN_USER=${ADMIN_USER}
@@ -43,9 +50,11 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=${DB_HOST}
-    depends_on:
-      - nextcloud-db
+    links:
+      - nextcloud-db:nextcloud-db
+      - redis:redis
     volumes:
       - nextcloud-data:/data
       - nextcloud-config:/config
       - nextcloud-apps:/apps2
+      - nextcloud-themes:/nextcloud/themes
